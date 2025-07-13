@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ford-Generation - Plataforma de Investimento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #0077b6;
+            --secondary-color: #00b4d8;
+            --accent-color: #90e0ef;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff, #e6f7ff);
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+        
+        .navbar-brand img {
+            height: 30px;
+        }
+        
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .btn-success {
+            background: linear-gradient(to right, var(--success-color), #5cb85c);
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(to right, var(--warning-color), #ffab00);
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(to right, var(--danger-color), #c82333);
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+        }
+        
+        .bottom-navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 10px 0;
+        }
+        
+        .nav-item {
+            text-align: center;
+        }
+        
+        .nav-link {
+            color: var(--dark-color);
+            font-size: 12px;
+        }
+        
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin: 0 auto 5px;
+        }
+        
+        .investment-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+        
+        .welcome-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .welcome-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .bank-logo {
+            height: 30px;
+            margin-right: 10px;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Notifications -->
+    <div class="toast-container"></div>
+
+    <!-- Welcome Popup -->
+    <div class="welcome-popup d-none">
+        <div class="welcome-content">
+            <h4>Bem-vindo à Plataforma Ford-Generation</h4>
+            <p>Plataforma de investimento de Produtos de Carro, opera nos Estados Unidos desde 2016</p>
+            <p>Convide pessoas e ganhará bónus de convite de:</p>
+            <ul class="text-start">
+                <li>Nível1: 24%</li>
+                <li>Nível2: 4%</li>
+                <li>Nível3: 1%</li>
+            </ul>
+            <p>Em caso de dúvida contacte o nosso apoio ao cliente</p>
+            <button class="btn btn-primary" id="closeWelcome">Obrigado</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" id="mainContainer">
+        <!-- Auth Screens -->
+        <div id="authScreens">
+            <!-- Login Screen -->
+            <div class="row justify-content-center mt-5" id="loginScreen">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="img-fluid" style="height: 50px;">
+                            <h4 class="mt-2">Login</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="loginPhone" class="form-label">Número de Telefone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+244</span>
+                                        <input type="tel" class="form-control" id="loginPhone" placeholder="900000000" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="loginPassword" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Não tem uma conta? <a href="#" id="showRegister">Registre-se</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Screen -->
+            <div class="row justify-content-center mt-5 d-none" id="registerScreen">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png" alt="Ford Logo" class="img-fluid" style="height: 50px;">
+                            <h4 class="mt-2">Criar Conta</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="registerForm">
+                                <div class="mb-3">
+                                    <label for="registerPhone" class="form-label">Número de Telefone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">+244</span>
+                                        <input type="tel" class="form-control" id="registerPhone" placeholder="900000000" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerName" class="form-label">Nome Completo</label>
+                                    <input type="text" class="form-control" id="registerName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerPassword" class="form-label">Senha</label>
+                                    <input type="password" class="form-control" id="registerPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="registerConfirmPassword" class="form-label">Confirmar Senha</label>
+                                    <input type="password" class="form-control" id="registerConfirmPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="inviteCode" class="form-label">Código de Convite (Opcional)</label>
+                                    <input type="text" class="form-control" id="inviteCode">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Já tem uma conta? <a href="#" id="showLogin">Faça login</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Screens -->
+        <div class="d-none" id="appScreens">
+            <!-- Home Screen -->
+            <div id="homeScreen">
+                <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                    <h4 class="m-0">Pacotes de Investimento</h4>
+                    <span class="badge bg-primary">Saldo: <span id="currentBalance">0</span>kz</span>
+                </div>
+                
+                <div class="row" id="investmentPackages">
+                    <!-- Packages will be loaded here -->
+                </div>
+            </div>
+
+            <!-- My Products Screen -->
+            <div class="d-none" id="myProductsScreen">
+                <h4 class="mt-3 mb-3">Meus Produtos</h4>
+                <div id="userProductsList">
+                    <div class="alert alert-info">Você ainda não investiu em nenhum produto</div>
+                </div>
+            </div>
+
+            <!-- Team Screen -->
+            <div class="d-none" id="teamScreen">
+                <h4 class="mt-3 mb-3">Minha Equipe</h4>
+                <div class="card mb-3">
+                    <div class="card-header">Resumo da Equipe</div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h5 id="level1Count">0</h5>
+                                <small>Nível 1</small>
+                            </div>
+                            <div class="col-4">
+                                <h5 id="level2Count">0</h5>
+                                <small>Nível 2</small>
+                            </div>
+                            <div class="col-4">
+                                <h5 id="level3Count">0</h5>
+                                <small>Nível 3</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">Como Funciona</div>
+                    <div class="card-body">
+                        <p>Ganhe bónus quando seus convidados investirem:</p>
+                        <ul>
+                            <li><strong>Nível 1:</strong> 24% do valor investido</li>
+                            <li><strong>Nível 2:</strong> 4% do valor investido</li>
+                            <li><strong>Nível 3:</strong> 1% do valor investido</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Seu Link de Convite</div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" id="inviteLink" readonly>
+                            <button class="btn btn-primary" id="copyInviteLink">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="small text-muted">Compartilhe este link para convidar pessoas e ganhar bónus</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div class="d-none" id="profileScreen">
+                <div class="card mb-3">
+                    <div class="card-header">Meu Perfil</div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user text-white" style="font-size: 40px;"></i>
+                            </div>
+                            <h5 class="mt-2" id="profileName">Nome do Usuário</h5>
+                            <p class="text-muted">ID: <span id="profileId">123456</span></p>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>Saldo Actual:</span>
+                            <span class="fw-bold" id="profileBalance">0 kz</span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-primary w-100" id="depositBtnProfile">
+                                    <i class="fas fa-money-bill-wave me-1"></i> Depósito
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-success w-100" id="withdrawBtnProfile">
+                                    <i class="fas fa-wallet me-1"></i> Retirar
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-info w-100" id="supportBtnProfile">
+                                    <i class="fas fa-headset me-1"></i> Apoio
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-warning w-100" id="transactionsBtn">
+                                    <i class="fas fa-exchange-alt me-1"></i> Transações
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-secondary w-100" id="bankAccountBtn">
+                                    <i class="fas fa-university me-1"></i> Conta Bancária
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-danger w-100" id="telegramBtn">
+                                    <i class="fab fa-telegram me-1"></i> Telegram
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-dark w-100" id="changePasswordBtn">
+                                    <i class="fas fa-key me-1"></i> Alterar Senha
+                                </button>
+                            </div>
+                            <div class="col-6 mb-2">
+                                <button class="btn btn-dark w-100" id="withdrawPasswordBtn">
+                                    <i class="fas fa-lock me-1"></i> Senha de Retirada
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deposit Screen -->
+            <div class="d-none" id="depositScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromDeposit">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Depósito</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">Selecione o Valor</div>
+                    <div class="card-body">
+                        <div class="row" id="depositAmounts">
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="5000">5,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="10000">10,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="20000">20,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="50000">50,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="100000">100,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="200000">200,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="500000">500,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="1000000">1,000,000kz</button>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <button class="btn btn-outline-primary w-100 deposit-amount" data-amount="2000000">2,000,000kz</button>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 d-none" id="proceedToDeposit">Avançar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deposit Details Screen -->
+            <div class="d-none" id="depositDetailsScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromDepositDetails">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Detalhes de Depósito</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">Método de Pagamento</div>
+                    <div class="card-body">
+                        <h5 class="text-center">PAGAMENTO POR REFERÊNCIA</h5>
+                        <div class="text-center mb-3">
+                            <img src="https://via.placeholder.com/150x50?text=Multicaixa" alt="Multicaixa" class="img-fluid">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">ENTIDADE</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="10116" readonly>
+                                <button class="btn btn-outline-secondary" id="copyEntity">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">NÚMERO</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" value="956315864" readonly>
+                                <button class="btn btn-outline-secondary" id="copyNumber">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Valor do Depósito</label>
+                            <input type="text" class="form-control" id="depositValueDisplay" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="depositProof" class="form-label">Enviar Comprovativo (PDF, JPG, PNG)</label>
+                            <input type="file" class="form-control" id="depositProof" accept=".pdf,.jpg,.jpeg,.png">
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" id="submitDeposit">Enviar Comprovativo</button>
+                        
+                        <div class="alert alert-info mt-3">
+                            <small>
+                                <p>Após o envio deve aguardar um período de 30 minutos para o valor ser refletido na sua conta</p>
+                                <p>Não deve meter valor acima ou abaixo do valor estipulado no preçario</p>
+                                <p>Não deve enviar comprovativo falso leva a suspensão da conta do usuário</p>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdraw Screen -->
+            <div class="d-none" id="withdrawScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromWithdraw">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Retirar</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">Detalhes de Retirada</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="withdrawAmount" class="form-label">Valor a Retirar</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="withdrawAmount" min="1700">
+                                <span class="input-group-text">kz</span>
+                            </div>
+                            <small class="text-muted">Saque mínimo: 1,700kz | Taxa: 10%</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Saldo Disponível</label>
+                            <input type="text" class="form-control" id="withdrawBalance" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="withdrawBank" class="form-label">Banco</label>
+                            <select class="form-select" id="withdrawBank" required>
+                                <option value="" selected disabled>Selecione o Banco</option>
+                                <option value="BIC">BIC</option>
+                                <option value="BFA">BFA</option>
+                                <option value="BAI">BAI</option>
+                                <option value="ATLÂNTICO">ATLÂNTICO</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3 d-none" id="bankAccountInfo">
+                            <label class="form-label">Conta Bancária</label>
+                            <input type="text" class="form-control" id="bankAccountDisplay" readonly>
+                        </div>
+                        
+                        <div class="mb-3 d-none" id="withdrawPasswordField">
+                            <label for="withdrawPassword" class="form-label">Senha de Retirada (6 dígitos)</label>
+                            <input type="password" class="form-control" id="withdrawPassword" maxlength="6" pattern="\d{6}" inputmode="numeric">
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" id="submitWithdraw">Levantar</button>
+                        
+                        <div class="alert alert-info mt-3">
+                            <small>
+                                <p>Os saques são feitos de Segunda a Sexta-Feira</p>
+                                <p>Horário de Retirada: 09h a 21h</p>
+                                <p>Aguarde pacientemente o valor chegará em sua conta num período de 30 minutos a 24h</p>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Screen -->
+            <div class="d-none" id="supportScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromSupport">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Apoio ao Cliente</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body" style="height: 300px; overflow-y: auto;" id="supportMessages">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-comments fa-3x mb-3"></i>
+                            <p>Envie uma mensagem para o nosso apoio ao cliente</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="supportMessage" placeholder="Digite sua mensagem...">
+                    <button class="btn btn-outline-secondary" type="button" id="sendSupportMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="supportAttachment" accept="image/*">
+                    <button class="btn btn-outline-secondary" type="button" id="sendSupportAttachment">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Prize Screen -->
+            <div class="d-none" id="prizeScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromPrize">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Prêmio</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="prizeCode" class="form-label">Código do Prêmio</label>
+                            <input type="text" class="form-control" id="prizeCode" placeholder="Digite o código">
+                        </div>
+                        <button class="btn btn-primary w-100" id="submitPrizeCode">Submeter</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transactions Screen -->
+            <div class="d-none" id="transactionsScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromTransactions">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Transações</h4>
+                </div>
+                
+                <div class="list-group" id="transactionsList">
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-exchange-alt fa-3x mb-3"></i>
+                        <p>Nenhuma transação encontrada</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bank Account Screen -->
+            <div class="d-none" id="bankAccountScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromBankAccount">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Conta Bancária</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div id="bankAccountsList">
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-university fa-3x mb-3"></i>
+                                <p>Nenhuma conta bancária cadastrada</p>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 mt-3" id="addBankAccount">
+                            <i class="fas fa-plus me-2"></i> Adicionar Conta Bancária
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Bank Account Screen -->
+            <div class="d-none" id="editBankAccountScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromEditBankAccount">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0" id="bankAccountFormTitle">Adicionar Conta Bancária</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="bankAccountForm">
+                            <input type="hidden" id="bankAccountId">
+                            <div class="mb-3">
+                                <label for="bankAccountName" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="bankAccountName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bankAccountIban" class="form-label">IBAN (máximo 21 dígitos)</label>
+                                <input type="text" class="form-control" id="bankAccountIban" maxlength="21" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bankAccountBank" class="form-label">Banco</label>
+                                <select class="form-select" id="bankAccountBank" required>
+                                    <option value="" selected disabled>Selecione o Banco</option>
+                                    <option value="BFA">BFA</option>
+                                    <option value="BAI">BAI</option>
+                                    <option value="BIC">BIC</option>
+                                    <option value="ATLÂNTICO">ATLÂNTICO</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password Screen -->
+            <div class="d-none" id="changePasswordScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromChangePassword">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Alterar Senha</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="changePasswordForm">
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">Senha Atual</label>
+                                <input type="password" class="form-control" id="currentPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">Nova Senha</label>
+                                <input type="password" class="form-control" id="newPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmNewPassword" class="form-label">Confirmar Nova Senha</label>
+                                <input type="password" class="form-control" id="confirmNewPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Alterar Senha</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdraw Password Screen -->
+            <div class="d-none" id="withdrawPasswordScreen">
+                <div class="d-flex align-items-center mb-3">
+                    <button class="btn btn-sm btn-outline-secondary me-2" id="backFromWithdrawPassword">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h4 class="m-0">Senha de Retirada</h4>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form id="withdrawPasswordForm">
+                            <div class="mb-3">
+                                <label for="newWithdrawPassword" class="form-label">Nova Senha de Retirada (6 dígitos)</label>
+                                <input type="password" class="form-control" id="newWithdrawPassword" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmWithdrawPassword" class="form-label">Confirmar Senha de Retirada</label>
+                                <input type="password" class="form-control" id="confirmWithdrawPassword" maxlength="6" pattern="\d{6}" inputmode="numeric" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Definir Senha</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investment Modal -->
+        <div class="modal fade" id="investmentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="investmentModalTitle">Investir</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <p>Saldo Actual: <span id="modalCurrentBalance">0</span>kz</p>
+                            <p>Valor do Produto: <span id="modalProductPrice">0</span>kz</p>
+                        </div>
+                        <p>Tem certeza que deseja investir neste produto?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="confirmInvestment">Investir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-navbar d-none" id="bottomNav">
+        <div class="container">
+            <div class="row">
+                <div class="col-3 nav-item">
+                    <a href="#" class="nav-link active" data-screen="home">
+                        <i class="fas fa-home"></i>
+                        <span>Início</span>
+                    </a>
+                </div>
+                <div class="col-3 nav-item">
+                    <a href="#" class="nav-link" data-screen="products">
+                        <i class="fas fa-box-open"></i>
+                        <span>Meus Produtos</span>
+                    </a>
+                </div>
+                <div class="col-3 nav-item">
+                    <a href="#" class="nav-link" data-screen="team">
+                        <i class="fas fa-users"></i>
+                        <span>Equipa</span>
+                    </a>
+                </div>
+                <div class="col-3 nav-item">
+                    <a href="#" class="nav-link" data-screen="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Perfil</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'SUA_URL_DO_SUPABASE';
+        const SUPABASE_KEY = 'SUA_CHAVE_DO_SUPABASE';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // App State
+        let currentUser = null;
+        let selectedPackage = null;
+        let selectedDepositAmount = 0;
+        let userBankAccounts = [];
+        
+        // Investment Packages Data
+        const investmentPackages = [
+            { id: 1, name: "5,000kz", price: 5000, dailyProfit: 1000, totalProfit: 90000, duration: 90 },
+            { id: 2, name: "10,000kz", price: 10000, dailyProfit: 2000, totalProfit: 180000, duration: 90 },
+            { id: 3, name: "20,000kz", price: 20000, dailyProfit: 4000, totalProfit: 360000, duration: 90 },
+            { id: 4, name: "50,000kz", price: 50000, dailyProfit: 10000, totalProfit: 900000, duration: 90 },
+            { id: 5, name: "100,000kz", price: 100000, dailyProfit: 20000, totalProfit: 1800000, duration: 90 },
+            { id: 6, name: "200,000kz", price: 200000, dailyProfit: 40000, totalProfit: 3600000, duration: 90 },
+            { id: 7, name: "500,000kz", price: 500000, dailyProfit: 100000, totalProfit: 9000000, duration: 90 },
+            { id: 8, name: "1,000,000kz", price: 1000000, dailyProfit: 200000, totalProfit: 18000000, duration: 90 },
+            { id: 9, name: "2,000,000kz", price: 2000000, dailyProfit: 400000, totalProfit: 36000000, duration: 90 }
+        ];
+        
+        // DOM Elements
+        const authScreens = document.getElementById('authScreens');
+        const appScreens = document.getElementById('appScreens');
+        const loginScreen = document.getElementById('loginScreen');
+        const registerScreen = document.getElementById('registerScreen');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        const bottomNav = document.getElementById('bottomNav');
+        const currentBalance = document.getElementById('currentBalance');
+        const investmentPackagesContainer = document.getElementById('investmentPackages');
+        const userProductsList = document.getElementById('userProductsList');
+        const level1Count = document.getElementById('level1Count');
+        const level2Count = document.getElementById('level2Count');
+        const level3Count = document.getElementById('level3Count');
+        const inviteLink = document.getElementById('inviteLink');
+        const copyInviteLink = document.getElementById('copyInviteLink');
+        const profileName = document.getElementById('profileName');
+        const profileId = document.getElementById('profileId');
+        const profileBalance = document.getElementById('profileBalance');
+        const depositBtnProfile = document.getElementById('depositBtnProfile');
+        const withdrawBtnProfile = document.getElementById('withdrawBtnProfile');
+        const supportBtnProfile = document.getElementById('supportBtnProfile');
+        const transactionsBtn = document.getElementById('transactionsBtn');
+        const bankAccountBtn = document.getElementById('bankAccountBtn');
+        const telegramBtn = document.getElementById('telegramBtn');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const withdrawPasswordBtn = document.getElementById('withdrawPasswordBtn');
+        const homeScreen = document.getElementById('homeScreen');
+        const myProductsScreen = document.getElementById('myProductsScreen');
+        const teamScreen = document.getElementById('teamScreen');
+        const profileScreen = document.getElementById('profileScreen');
+        const depositScreen = document.getElementById('depositScreen');
+        const withdrawScreen = document.getElementById('withdrawScreen');
+        const supportScreen = document.getElementById('supportScreen');
+        const prizeScreen = document.getElementById('prizeScreen');
+        const transactionsScreen = document.getElementById('transactionsScreen');
+        const bankAccountScreen = document.getElementById('bankAccountScreen');
+        const editBankAccountScreen = document.getElementById('editBankAccountScreen');
+        const changePasswordScreen = document.getElementById('changePasswordScreen');
+        const withdrawPasswordScreen = document.getElementById('withdrawPasswordScreen');
+        const backFromDeposit = document.getElementById('backFromDeposit');
+        const backFromWithdraw = document.getElementById('backFromWithdraw');
+        const backFromSupport = document.getElementById('backFromSupport');
+        const backFromPrize = document.getElementById('backFromPrize');
+        const backFromTransactions = document.getElementById('backFromTransactions');
+        const backFromBankAccount = document.getElementById('backFromBankAccount');
+        const backFromEditBankAccount = document.getElementById('backFromEditBankAccount');
+        const backFromChangePassword = document.getElementById('backFromChangePassword');
+        const backFromWithdrawPassword = document.getElementById('backFromWithdrawPassword');
+        const depositAmounts = document.querySelectorAll('.deposit-amount');
+        const proceedToDeposit = document.getElementById('proceedToDeposit');
+        const depositDetailsScreen = document.getElementById('depositDetailsScreen');
+        const backFromDepositDetails = document.getElementById('backFromDepositDetails');
+        const depositValueDisplay = document.getElementById('depositValueDisplay');
+        const submitDeposit = document.getElementById('submitDeposit');
+        const withdrawAmount = document.getElementById('withdrawAmount');
+        const withdrawBalance = document.getElementById('withdrawBalance');
+        const withdrawBank = document.getElementById('withdrawBank');
+        const bankAccountInfo = document.getElementById('bankAccountInfo');
+        const bankAccountDisplay = document.getElementById('bankAccountDisplay');
+        const withdrawPasswordField = document.getElementById('withdrawPasswordField');
+        const submitWithdraw = document.getElementById('submitWithdraw');
+        const supportMessages = document.getElementById('supportMessages');
+        const supportMessage = document.getElementById('supportMessage');
+        const sendSupportMessage = document.getElementById('sendSupportMessage');
+        const supportAttachment = document.getElementById('supportAttachment');
+        const sendSupportAttachment = document.getElementById('sendSupportAttachment');
+        const prizeCode = document.getElementById('prizeCode');
+        const submitPrizeCode = document.getElementById('submitPrizeCode');
+        const transactionsList = document.getElementById('transactionsList');
+        const bankAccountsList = document.getElementById('bankAccountsList');
+        const addBankAccount = document.getElementById('addBankAccount');
+        const bankAccountForm = document.getElementById('bankAccountForm');
+        const bankAccountId = document.getElementById('bankAccountId');
+        const bankAccountName = document.getElementById('bankAccountName');
+        const bankAccountIban = document.getElementById('bankAccountIban');
+        const bankAccountBank = document.getElementById('bankAccountBank');
+        const bankAccountFormTitle = document.getElementById('bankAccountFormTitle');
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const currentPassword = document.getElementById('currentPassword');
+        const newPassword = document.getElementById('newPassword');
+        const confirmNewPassword = document.getElementById('confirmNewPassword');
+        const withdrawPasswordForm = document.getElementById('withdrawPasswordForm');
+        const newWithdrawPassword = document.getElementById('newWithdrawPassword');
+        const confirmWithdrawPassword = document.getElementById('confirmWithdrawPassword');
+        const investmentModal = new bootstrap.Modal(document.getElementById('investmentModal'));
+        const modalCurrentBalance = document.getElementById('modalCurrentBalance');
+        const modalProductPrice = document.getElementById('modalProductPrice');
+        const confirmInvestment = document.getElementById('confirmInvestment');
+        const welcomePopup = document.querySelector('.welcome-popup');
+        const closeWelcome = document.getElementById('closeWelcome');
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            
+            // Navigation
+            document.querySelectorAll('[data-screen]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showScreen(link.getAttribute('data-screen'));
+                    
+                    // Update active state
+                    document.querySelectorAll('.nav-link').forEach(navLink => {
+                        navLink.classList.remove('active');
+                    });
+                    link.classList.add('active');
+                });
+            });
+            
+            // Auth
+            showRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginScreen.classList.add('d-none');
+                registerScreen.classList.remove('d-none');
+            });
+            
+            showLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerScreen.classList.add('d-none');
+                loginScreen.classList.remove('d-none');
+            });
+            
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const phone = '+244' + document.getElementById('loginPhone').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                await loginUser(phone, password);
+            });
+            
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const phone = '+244' + document.getElementById('registerPhone').value;
+                const name = document.getElementById('registerName').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('registerConfirmPassword').value;
+                const inviteCode = document.getElementById('inviteCode').value;
+                
+                if (password !== confirmPassword) {
+                    showToast('As senhas não coincidem', 'danger');
+                    return;
+                }
+                
+                await registerUser(phone, name, password, inviteCode);
+            });
+            
+            // Deposit
+            depositAmounts.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    selectedDepositAmount = parseInt(button.getAttribute('data-amount'));
+                    
+                    // Remove active class from all buttons
+                    depositAmounts.forEach(btn => btn.classList.remove('btn-primary'));
+                    depositAmounts.forEach(btn => btn.classList.add('btn-outline-primary'));
+                    
+                    // Add active class to clicked button
+                    button.classList.remove('btn-outline-primary');
+                    button.classList.add('btn-primary');
+                    
+                    proceedToDeposit.classList.remove('d-none');
+                });
+            });
+            
+            proceedToDeposit.addEventListener('click', (e) => {
+                e.preventDefault();
+                depositValueDisplay.value = selectedDepositAmount.toLocaleString() + 'kz';
+                showScreen('depositDetails');
+            });
+            
+            submitDeposit.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('depositProof');
+                
+                if (fileInput.files.length === 0) {
+                    showToast('Por favor, envie o comprovativo', 'danger');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                const fileName = `deposit_${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+                
+                try {
+                    // Upload file to Supabase storage
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('deposit-proofs')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    // Create deposit record
+                    const { data, error } = await supabase
+                        .from('deposits')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                amount: selectedDepositAmount, 
+                                proof_url: fileName,
+                                status: 'pending'
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    showToast('Comprovativo enviado com sucesso! Aguarde a confirmação.', 'success');
+                    setTimeout(() => {
+                        showScreen('home');
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error submitting deposit:', error);
+                    showToast('Erro ao enviar comprovativo', 'danger');
+                }
+            });
+            
+            // Withdraw
+            withdrawBtnProfile.addEventListener('click', (e) => {
+                e.preventDefault();
+                showScreen('withdraw');
+                withdrawBalance.value = currentUser.balance.toLocaleString() + 'kz';
+            });
+            
+            withdrawBank.addEventListener('change', () => {
+                // Check if user has bank accounts
+                if (userBankAccounts.length > 0) {
+                    const selectedBank = withdrawBank.value;
+                    const account = userBankAccounts.find(acc => acc.bank === selectedBank);
+                    
+                    if (account) {
+                        bankAccountInfo.classList.remove('d-none');
+                        bankAccountDisplay.value = `${account.name} - ${account.iban}`;
+                    } else {
+                        bankAccountInfo.classList.add('d-none');
+                    }
+                }
+                
+                // Show withdraw password field if bank is selected
+                if (withdrawBank.value && currentUser.withdraw_password) {
+                    withdrawPasswordField.classList.remove('d-none');
+                } else {
+                    withdrawPasswordField.classList.add('d-none');
+                }
+            });
+            
+            submitWithdraw.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const amount = parseInt(withdrawAmount.value);
+                const bank = withdrawBank.value;
+                const password = document.getElementById('withdrawPassword')?.value;
+                
+                if (!amount || amount < 1700) {
+                    showToast('O valor mínimo para retirada é 1,700kz', 'danger');
+                    return;
+                }
+                
+                if (amount > currentUser.balance) {
+                    showToast('Saldo insuficiente', 'danger');
+                    return;
+                }
+                
+                if (!bank) {
+                    showToast('Selecione um banco', 'danger');
+                    return;
+                }
+                
+                if (currentUser.withdraw_password && password !== currentUser.withdraw_password) {
+                    showToast('Senha de retirada incorreta', 'danger');
+                    return;
+                }
+                
+                try {
+                    // Check if user has active investments
+                    const { data: investments, error: investmentsError } = await supabase
+                        .from('investments')
+                        .select('*')
+                        .eq('user_id', currentUser.id)
+                        .eq('status', 'active');
+                    
+                    if (investmentsError) throw investmentsError;
+                    
+                    if (investments.length === 0) {
+                        showToast('Precisa ter um plano activo', 'danger');
+                        return;
+                    }
+                    
+                    // Create withdrawal request
+                    const { data, error } = await supabase
+                        .from('withdrawals')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                amount: amount,
+                                fee: amount * 0.1, // 10% fee
+                                net_amount: amount * 0.9, // 90% of amount
+                                bank: bank,
+                                status: 'pending'
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    // Update user balance
+                    const { error: updateError } = await supabase
+                        .from('users')
+                        .update({ balance: currentUser.balance - amount })
+                        .eq('id', currentUser.id);
+                    
+                    if (updateError) throw updateError;
+                    
+                    // Add transaction record
+                    await supabase
+                        .from('transactions')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                type: 'withdrawal',
+                                amount: -amount,
+                                description: `Pedido de retirada para ${bank}`,
+                                status: 'pending'
+                            }
+                        ]);
+                    
+                    showToast('O seu saque está sendo processado', 'success');
+                    setTimeout(() => {
+                        showScreen('home');
+                        loadUserData();
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error processing withdrawal:', error);
+                    showToast('Erro ao processar retirada', 'danger');
+                }
+            });
+            
+            // Support
+            sendSupportMessage.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const message = supportMessage.value.trim();
+                
+                if (!message) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('support_messages')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                message: message,
+                                sender: 'user'
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    supportMessage.value = '';
+                    loadSupportMessages();
+                } catch (error) {
+                    console.error('Error sending support message:', error);
+                    showToast('Erro ao enviar mensagem', 'danger');
+                }
+            });
+            
+            sendSupportAttachment.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('supportAttachment');
+                
+                if (fileInput.files.length === 0) {
+                    showToast('Selecione um arquivo', 'danger');
+                    return;
+                }
+                
+                const file = fileInput.files[0];
+                const fileName = `support_${currentUser.id}_${Date.now()}.${file.name.split('.').pop()}`;
+                
+                try {
+                    // Upload file to Supabase storage
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('support-attachments')
+                        .upload(fileName, file);
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    // Create support message with attachment
+                    const { data, error } = await supabase
+                        .from('support_messages')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                message: 'Anexo enviado',
+                                attachment_url: fileName,
+                                sender: 'user'
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    fileInput.value = '';
+                    loadSupportMessages();
+                } catch (error) {
+                    console.error('Error sending attachment:', error);
+                    showToast('Erro ao enviar anexo', 'danger');
+                }
+            });
+            
+            // Prize
+            submitPrizeCode.addEventListener('click', async (e) => {
+                e.preventDefault();
+                const code = prizeCode.value.trim();
+                
+                if (!code) {
+                    showToast('Digite o código do prêmio', 'danger');
+                    return;
+                }
+                
+                try {
+                    // Check if code is valid
+                    const { data: prize, error: prizeError } = await supabase
+                        .from('prize_codes')
+                        .select('*')
+                        .eq('code', code)
+                        .eq('is_used', false)
+                        .single();
+                    
+                    if (prizeError || !prize) {
+                        showToast('Código inválido ou já utilizado', 'danger');
+                        return;
+                    }
+                    
+                    // Update prize code as used
+                    const { error: updateError } = await supabase
+                        .from('prize_codes')
+                        .update({ is_used: true, used_by: currentUser.id, used_at: new Date() })
+                        .eq('id', prize.id);
+                    
+                    if (updateError) throw updateError;
+                    
+                    // Add prize amount to user balance
+                    const { error: userError } = await supabase
+                        .from('users')
+                        .update({ balance: currentUser.balance + prize.amount })
+                        .eq('id', currentUser.id);
+                    
+                    if (userError) throw userError;
+                    
+                    // Add transaction record
+                    await supabase
+                        .from('transactions')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                type: 'prize',
+                                amount: prize.amount,
+                                description: `Prêmio resgatado - Código: ${code}`,
+                                status: 'completed'
+                            }
+                        ]);
+                    
+                    showToast(`Prêmio de ${prize.amount}kz resgatado com sucesso!`, 'success');
+                    prizeCode.value = '';
+                    loadUserData();
+                } catch (error) {
+                    console.error('Error redeeming prize:', error);
+                    showToast('Erro ao resgatar prêmio', 'danger');
+                }
+            });
+            
+            // Bank Accounts
+            addBankAccount.addEventListener('click', (e) => {
+                e.preventDefault();
+                bankAccountForm.reset();
+                bankAccountId.value = '';
+                bankAccountFormTitle.textContent = 'Adicionar Conta Bancária';
+                showScreen('editBankAccount');
+            });
+            
+            bankAccountForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = bankAccountName.value.trim();
+                const iban = bankAccountIban.value.trim();
+                const bank = bankAccountBank.value;
+                const id = bankAccountId.value;
+                
+                try {
+                    // Check if IBAN is already registered by another user
+                    if (!id) {
+                        const { data: existingAccount, error: checkError } = await supabase
+                            .from('bank_accounts')
+                            .select('*')
+                            .eq('iban', iban)
+                            .neq('user_id', currentUser.id)
+                            .single();
+                        
+                        if (existingAccount) {
+                            showToast('Este IBAN já está registrado por outro usuário', 'danger');
+                            return;
+                        }
+                    }
+                    
+                    if (id) {
+                        // Update existing account
+                        const { data, error } = await supabase
+                            .from('bank_accounts')
+                            .update({ name, iban, bank })
+                            .eq('id', id);
+                        
+                        if (error) throw error;
+                        
+                        showToast('Conta bancária atualizada com sucesso', 'success');
+                    } else {
+                        // Create new account
+                        const { data, error } = await supabase
+                            .from('bank_accounts')
+                            .insert([
+                                { user_id: currentUser.id, name, iban, bank, is_default: userBankAccounts.length === 0 }
+                            ]);
+                        
+                        if (error) throw error;
+                        
+                        showToast('Conta bancária adicionada com sucesso', 'success');
+                    }
+                    
+                    loadBankAccounts();
+                    showScreen('bankAccount');
+                } catch (error) {
+                    console.error('Error saving bank account:', error);
+                    showToast('Erro ao salvar conta bancária', 'danger');
+                }
+            });
+            
+            // Password Change
+            changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const currentPwd = currentPassword.value;
+                const newPwd = newPassword.value;
+                const confirmPwd = confirmNewPassword.value;
+                
+                if (newPwd !== confirmPwd) {
+                    showToast('As novas senhas não coincidem', 'danger');
+                    return;
+                }
+                
+                if (currentPwd !== currentUser.password) {
+                    showToast('Senha atual incorreta', 'danger');
+                    return;
+                }
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .update({ password: newPwd })
+                        .eq('id', currentUser.id);
+                    
+                    if (error) throw error;
+                    
+                    showToast('Senha alterada com sucesso', 'success');
+                    setTimeout(() => {
+                        showScreen('profile');
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error changing password:', error);
+                    showToast('Erro ao alterar senha', 'danger');
+                }
+            });
+            
+            // Withdraw Password
+            withdrawPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPwd = newWithdrawPassword.value;
+                const confirmPwd = confirmWithdrawPassword.value;
+                
+                if (newPwd !== confirmPwd) {
+                    showToast('As senhas não coincidem', 'danger');
+                    return;
+                }
+                
+                if (newPwd.length !== 6 || !/^\d+$/.test(newPwd)) {
+                    showToast('A senha deve ter exatamente 6 dígitos', 'danger');
+                    return;
+                }
+                
+                if (currentUser.withdraw_password) {
+                    showToast('A senha de retirada só pode ser definida uma vez', 'danger');
+                    return;
+                }
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .update({ withdraw_password: newPwd })
+                        .eq('id', currentUser.id);
+                    
+                    if (error) throw error;
+                    
+                    showToast('Senha de retirada definida com sucesso', 'success');
+                    setTimeout(() => {
+                        showScreen('profile');
+                        loadUserData();
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error setting withdraw password:', error);
+                    showToast('Erro ao definir senha de retirada', 'danger');
+                }
+            });
+            
+            // Investment Modal
+            confirmInvestment.addEventListener('click', async () => {
+                try {
+                    if (selectedPackage.price > currentUser.balance) {
+                        showToast('Saldo insuficiente', 'danger');
+                        investmentModal.hide();
+                        return;
+                    }
+                    
+                    // Create investment
+                    const { data, error } = await supabase
+                        .from('investments')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                package_id: selectedPackage.id,
+                                amount: selectedPackage.price,
+                                daily_profit: selectedPackage.dailyProfit,
+                                total_profit: selectedPackage.totalProfit,
+                                start_date: new Date(),
+                                end_date: new Date(Date.now() + selectedPackage.duration * 24 * 60 * 60 * 1000),
+                                status: 'active'
+                            }
+                        ]);
+                    
+                    if (error) throw error;
+                    
+                    // Update user balance
+                    const { error: updateError } = await supabase
+                        .from('users')
+                        .update({ balance: currentUser.balance - selectedPackage.price })
+                        .eq('id', currentUser.id);
+                    
+                    if (updateError) throw updateError;
+                    
+                    // Add transaction record
+                    await supabase
+                        .from('transactions')
+                        .insert([
+                            { 
+                                user_id: currentUser.id, 
+                                type: 'investment',
+                                amount: -selectedPackage.price,
+                                description: `Investimento no pacote ${selectedPackage.name}`,
+                                status: 'completed'
+                            }
+                        ]);
+                    
+                    // Check if user was invited and add referral bonuses
+                    if (currentUser.referred_by) {
+                        await addReferralBonuses(currentUser.referred_by, selectedPackage.price);
+                    }
+                    
+                    showToast('Investimento realizado com sucesso!', 'success');
+                    investmentModal.hide();
+                    loadUserData();
+                    loadUserInvestments();
+                } catch (error) {
+                    console.error('Error creating investment:', error);
+                    showToast('Erro ao realizar investimento', 'danger');
+                    investmentModal.hide();
+                }
+            });
+            
+            // Welcome popup
+            closeWelcome.addEventListener('click', () => {
+                welcomePopup.classList.add('d-none');
+            });
+            
+            // Copy buttons
+            copyInviteLink.addEventListener('click', () => {
+                navigator.clipboard.writeText(inviteLink.value);
+                showToast('Link copiado!', 'success');
+            });
+            
+            document.getElementById('copyEntity').addEventListener('click', () => {
+                navigator.clipboard.writeText('10116');
+                showToast('Entidade copiada!', 'success');
+            });
+            
+            document.getElementById('copyNumber').addEventListener('click', () => {
+                navigator.clipboard.writeText('956315864');
+                showToast('Número copiado!', 'success');
+            });
+            
+            // Telegram button
+            telegramBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open('https://t.me/fordgeneration', '_blank');
+            });
+            
+            // Back buttons
+            backFromDeposit.addEventListener('click', () => showScreen('home'));
+            backFromWithdraw.addEventListener('click', () => showScreen('profile'));
+            backFromSupport.addEventListener('click', () => showScreen('profile'));
+            backFromPrize.addEventListener('click', () => showScreen('home'));
+            backFromTransactions.addEventListener('click', () => showScreen('profile'));
+            backFromBankAccount.addEventListener('click', () => showScreen('profile'));
+            backFromEditBankAccount.addEventListener('click', () => showScreen('bankAccount'));
+            backFromChangePassword.addEventListener('click', () => showScreen('profile'));
+            backFromWithdrawPassword.addEventListener('click', () => showScreen('profile'));
+            backFromDepositDetails.addEventListener('click', () => showScreen('deposit'));
+        });
+        
+        // Functions
+        async function checkAuth() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (user) {
+                // User is logged in
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+                
+                if (userError) {
+                    console.error('Error fetching user data:', userError);
+                    await supabase.auth.signOut();
+                    showAuthScreen();
+                    return;
+                }
+                
+                currentUser = userData;
+                showAppScreen();
+                loadUserData();
+                
+                // Show welcome popup if first login
+                if (currentUser.first_login) {
+                    welcomePopup.classList.remove('d-none');
+                    
+                    // Update first_login flag
+                    await supabase
+                        .from('users')
+                        .update({ first_login: false })
+                        .eq('id', currentUser.id);
+                }
+            } else {
+                // No user logged in
+                showAuthScreen();
+            }
+        }
+        
+        function showAuthScreen() {
+            authScreens.classList.remove('d-none');
+            appScreens.classList.add('d-none');
+            bottomNav.classList.add('d-none');
+            loginScreen.classList.remove('d-none');
+            registerScreen.classList.add('d-none');
+        }
+        
+        function showAppScreen() {
+            authScreens.classList.add('d-none');
+            appScreens.classList.remove('d-none');
+            bottomNav.classList.remove('d-none');
+            showScreen('home');
+        }
+        
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('#appScreens > div').forEach(screen => {
+                screen.classList.add('d-none');
+            });
+            
+            // Show selected screen
+            switch (screenName) {
+                case 'home':
+                    homeScreen.classList.remove('d-none');
+                    loadInvestmentPackages();
+                    break;
+                case 'products':
+                    myProductsScreen.classList.remove('d-none');
+                    loadUserInvestments();
+                    break;
+                case 'team':
+                    teamScreen.classList.remove('d-none');
+                    loadTeamData();
+                    break;
+                case 'profile':
+                    profileScreen.classList.remove('d-none');
+                    break;
+                case 'deposit':
+                    depositScreen.classList.remove('d-none');
+                    selectedDepositAmount = 0;
+                    document.querySelectorAll('.deposit-amount').forEach(btn => {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline-primary');
+                    });
+                    proceedToDeposit.classList.add('d-none');
+                    break;
+                case 'depositDetails':
+                    depositDetailsScreen.classList.remove('d-none');
+                    break;
+                case 'withdraw':
+                    withdrawScreen.classList.remove('d-none');
+                    withdrawAmount.value = '';
+                    withdrawBank.value = '';
+                    bankAccountInfo.classList.add('d-none');
+                    withdrawPasswordField.classList.add('d-none');
+                    break;
+                case 'support':
+                    supportScreen.classList.remove('d-none');
+                    loadSupportMessages();
+                    break;
+                case 'prize':
+                    prizeScreen.classList.remove('d-none');
+                    break;
+                case 'transactions':
+                    transactionsScreen.classList.remove('d-none');
+                    loadTransactions();
+                    break;
+                case 'bankAccount':
+                    bankAccountScreen.classList.remove('d-none');
+                    loadBankAccounts();
+                    break;
+                case 'editBankAccount':
+                    editBankAccountScreen.classList.remove('d-none');
+                    break;
+                case 'changePassword':
+                    changePasswordScreen.classList.remove('d-none');
+                    break;
+                case 'withdrawPassword':
+                    withdrawPasswordScreen.classList.remove('d-none');
+                    break;
+            }
+        }
+        
+        async function loginUser(phone, password) {
+            try {
+                // Check if user exists
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('phone', phone)
+                    .eq('password', password)
+                    .single();
+                
+                if (error || !user) {
+                    showToast('Número de telefone ou senha incorretos', 'danger');
+                    return;
+                }
+                
+                // Sign in with Supabase Auth (email/password auth is used here with phone as email)
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: phone + '@fordgeneration.com', // Using phone as unique identifier
+                    password: password
+                });
+                
+                if (authError) throw authError;
+                
+                currentUser = user;
+                showAppScreen();
+                loadUserData();
+                
+                // Show welcome popup if first login
+                if (currentUser.first_login) {
+                    welcomePopup.classList.remove('d-none');
+                    
+                    // Update first_login flag
+                    await supabase
+                        .from('users')
+                        .update({ first_login: false })
+                        .eq('id', currentUser.id);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Erro ao fazer login', 'danger');
+            }
+        }
+        
+        async function registerUser(phone, name, password, inviteCode = null) {
+            try {
+                // Check if phone already exists
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('phone', phone)
+                    .single();
+                
+                if (existingUser) {
+                    showToast('Este número de telefone já está registrado', 'danger');
+                    return;
+                }
+                
+                // Generate referral code
+                const referralCode = generateReferralCode();
+                
+                // Create user in auth table (using phone as email)
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: phone + '@fordgeneration.com',
+                    password: password,
+                });
+                
+                if (authError) throw authError;
+                
+                // Create user in users table
+                const userData = {
+                    id: authData.user.id,
+                    phone,
+                    name,
+                    password,
+                    referral_code: referralCode,
+                    balance: 500, // Bonus for registration
+                    first_login: true
+                };
+                
+                // Check if user was invited
+                if (inviteCode) {
+                    const { data: referrer, error: referrerError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('referral_code', inviteCode)
+                        .single();
+                    
+                    if (referrer) {
+                        userData.referred_by = referrer.id;
+                    }
+                }
+                
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([userData]);
+                
+                if (error) throw error;
+                
+                // Add registration bonus transaction
+                await supabase
+                    .from('transactions')
+                    .insert([
+                        { 
+                            user_id: authData.user.id, 
+                            type: 'bonus',
+                            amount: 500,
+                            description: 'Bónus de registo',
+                            status: 'completed'
+                        }
+                    ]);
+                
+                showToast('Registro realizado com sucesso! Você ganhou 500kz de bónus.', 'success');
+                
+                // Auto login
+                await loginUser(phone, password);
+            } catch (error) {
+                console.error('Registration error:', error);
+                showToast('Erro ao registrar usuário', 'danger');
+            }
+        }
+        
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        async function loadUserData() {
+            try {
+                // Get updated user data
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) throw error;
+                
+                currentUser = user;
+                
+                // Update UI
+                currentBalance.textContent = currentUser.balance.toLocaleString();
+                profileBalance.textContent = currentUser.balance.toLocaleString() + 'kz';
+                profileName.textContent = currentUser.name;
+                profileId.textContent = currentUser.id.slice(0, 8).toUpperCase();
+                
+                // Generate invite link
+                inviteLink.value = `${window.location.origin}?ref=${currentUser.referral_code}`;
+                
+                // Load bank accounts
+                await loadBankAccounts();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        async function loadBankAccounts() {
+            try {
+                const { data: accounts, error } = await supabase
+                    .from('bank_accounts')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('is_default', { ascending: false });
+                
+                if (error) throw error;
+                
+                userBankAccounts = accounts;
+                
+                // Update UI
+                if (accounts.length > 0) {
+                    let html = '';
+                    accounts.forEach(account => {
+                        html += `
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">${account.name}</h6>
+                                        <small class="text-muted">${account.iban} | ${account.bank}</small>
+                                    </div>
+                                    <div>
+                                        ${account.is_default ? '<span class="badge bg-primary">Padrão</span>' : ''}
+                                        <button class="btn btn-sm btn-outline-primary edit-bank-account" data-id="${account.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    bankAccountsList.innerHTML = html;
+                    
+                    // Add event listeners to edit buttons
+                    document.querySelectorAll('.edit-bank-account').forEach(button => {
+                        button.addEventListener('click', async (e) => {
+                            const accountId = button.getAttribute('data-id');
+                            const account = accounts.find(acc => acc.id === accountId);
+                            
+                            if (account) {
+                                bankAccountId.value = account.id;
+                                bankAccountName.value = account.name;
+                                bankAccountIban.value = account.iban;
+                                bankAccountBank.value = account.bank;
+                                bankAccountFormTitle.textContent = 'Editar Conta Bancária';
+                                showScreen('editBankAccount');
+                            }
+                        });
+                    });
+                } else {
+                    bankAccountsList.innerHTML = `
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-university fa-3x mb-3"></i>
+                            <p>Nenhuma conta bancária cadastrada</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading bank accounts:', error);
+            }
+        }
+        
+        function loadInvestmentPackages() {
+            let html = '';
+            investmentPackages.forEach(pkg => {
+                html += `
+                    <div class="col-12 mb-3">
+                        <div class="card investment-card">
+                            <div class="card-header">
+                                ${pkg.name}
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <p class="mb-1"><small>Lucro Diário</small></p>
+                                        <h6>${pkg.dailyProfit.toLocaleString()}kz</h6>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="mb-1"><small>Duração</small></p>
+                                        <h6>${pkg.duration} Dias</h6>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <p class="mb-1"><small>Lucro Total</small></p>
+                                        <h5>${pkg.totalProfit.toLocaleString()}kz</h5>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-2 invest-btn" data-id="${pkg.id}">
+                                    <i class="fas fa-coins me-2"></i> Investir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            investmentPackagesContainer.innerHTML = html;
+            
+            // Add event listeners to invest buttons
+            document.querySelectorAll('.invest-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const packageId = parseInt(button.getAttribute('data-id'));
+                    selectedPackage = investmentPackages.find(pkg => pkg.id === packageId);
+                    
+                    if (selectedPackage) {
+                        modalCurrentBalance.textContent = currentUser.balance.toLocaleString();
+                        modalProductPrice.textContent = selectedPackage.price.toLocaleString();
+                        investmentModal.show();
+                    }
+                });
+            });
+        }
+        
+        async function loadUserInvestments() {
+            try {
+                const { data: investments, error } = await supabase
+                    .from('investments')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (investments.length > 0) {
+                    let html = '';
+                    investments.forEach(investment => {
+                        const packageInfo = investmentPackages.find(pkg => pkg.id === investment.package_id);
+                        const startDate = new Date(investment.start_date);
+                        const endDate = new Date(investment.end_date);
+                        const today = new Date();
+                        const daysPassed = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                        const daysRemaining = Math.max(0, Math.floor((endDate - today) / (1000 * 60 * 60 * 24)));
+                        const progress = Math.min(100, Math.floor((daysPassed / investment.duration) * 100);
+                        
+                        html += `
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    ${packageInfo ? packageInfo.name : 'Pacote'} - ${investment.status === 'active' ? 'Ativo' : 'Concluído'}
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-1"><small>Início</small></p>
+                                            <h6>${startDate.toLocaleDateString()}</h6>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><small>Término</small></p>
+                                            <h6>${endDate.toLocaleDateString()}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <p class="mb-1"><small>Dias Restantes</small></p>
+                                            <h6>${daysRemaining}</h6>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="mb-1"><small>Rendimento Diário</small></p>
+                                            <h6>${investment.daily_profit.toLocaleString()}kz</h6>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-3">
+                                        <div class="progress-bar" role="progressbar" style="width: ${progress}%" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-1">
+                                        <small>${daysPassed}/${investment.duration} dias</small>
+                                        <small>${progress}%</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    userProductsList.innerHTML = html;
+                } else {
+                    userProductsList.innerHTML = `
+                        <div class="alert alert-info">Você ainda não investiu em nenhum produto</div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading user investments:', error);
+            }
+        }
+        
+        async function loadTeamData() {
+            try {
+                // Level 1 (direct referrals)
+                const { data: level1, error: level1Error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('referred_by', currentUser.id);
+                
+                if (level1Error) throw level1Error;
+                
+                // Level 2 (referrals of referrals)
+                let level2 = [];
+                if (level1.length > 0) {
+                    const { data: level2Data, error: level2Error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .in('referred_by', level1.map(user => user.id));
+                    
+                    if (level2Error) throw level2Error;
+                    level2 = level2Data;
+                }
+                
+                // Level 3 (referrals of referrals of referrals)
+                let level3 = [];
+                if (level2.length > 0) {
+                    const { data: level3Data, error: level3Error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .in('referred_by', level2.map(user => user.id));
+                    
+                    if (level3Error) throw level3Error;
+                    level3 = level3Data;
+                }
+                
+                // Update UI
+                level1Count.textContent = level1.length;
+                level2Count.textContent = level2.length;
+                level3Count.textContent = level3.length;
+            } catch (error) {
+                console.error('Error loading team data:', error);
+            }
+        }
+        
+        async function loadSupportMessages() {
+            try {
+                const { data: messages, error } = await supabase
+                    .from('support_messages')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: true });
+                
+                if (error) throw error;
+                
+                if (messages.length > 0) {
+                    let html = '';
+                    messages.forEach(msg => {
+                        if (msg.sender === 'user') {
+                            html += `
+                                <div class="d-flex justify-content-end mb-3">
+                                    <div class="bg-primary text-white p-3 rounded-3" style="max-width: 80%;">
+                                        ${msg.message}
+                                        ${msg.attachment_url ? `<div class="mt-2"><a href="#" class="text-white" onclick="downloadAttachment('${msg.attachment_url}')"><i class="fas fa-paperclip"></i> Anexo</a></div>` : ''}
+                                        <div class="text-end"><small>${new Date(msg.created_at).toLocaleTimeString()}</small></div>
+                                    </div>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="d-flex justify-content-start mb-3">
+                                    <div class="bg-light p-3 rounded-3" style="max-width: 80%;">
+                                        ${msg.message}
+                                        ${msg.attachment_url ? `<div class="mt-2"><a href="#" onclick="downloadAttachment('${msg.attachment_url}')"><i class="fas fa-paperclip"></i> Anexo</a></div>` : ''}
+                                        <div class="text-end"><small>${new Date(msg.created_at).toLocaleTimeString()}</small></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    supportMessages.innerHTML = html;
+                    supportMessages.scrollTop = supportMessages.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error loading support messages:', error);
+            }
+        }
+        
+        async function loadTransactions() {
+            try {
+                const { data: transactions, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (transactions.length > 0) {
+                    let html = '';
+                    transactions.forEach(tx => {
+                        const isPositive = tx.amount > 0;
+                        const icon = tx.type === 'deposit' ? 'fa-arrow-down' : 
+                                      tx.type === 'withdrawal' ? 'fa-arrow-up' : 
+                                      tx.type === 'investment' ? 'fa-coins' : 
+                                      tx.type === 'profit' ? 'fa-chart-line' : 
+                                      tx.type === 'bonus' ? 'fa-gift' : 
+                                      tx.type === 'prize' ? 'fa-trophy' : 
+                                      'fa-exchange-alt';
+                        
+                        html += `
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-${isPositive ? 'success' : 'danger'} bg-opacity-10 p-2 rounded-3 me-3">
+                                            <i class="fas ${icon} text-${isPositive ? 'success' : 'danger'}"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">${tx.description}</h6>
+                                            <small class="text-muted">${new Date(tx.created_at).toLocaleDateString()}</small>
+                                        </div>
+                                    </div>
+                                    <div class="text-${isPositive ? 'success' : 'danger'}">
+                                        ${isPositive ? '+' : ''}${tx.amount.toLocaleString()}kz
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    transactionsList.innerHTML = html;
+                } else {
+                    transactionsList.innerHTML = `
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-exchange-alt fa-3x mb-3"></i>
+                            <p>Nenhuma transação encontrada</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+        
+        async function addReferralBonuses(referrerId, investmentAmount) {
+            try {
+                // Get referrer and their upline
+                const { data: referrer, error: referrerError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', referrerId)
+                    .single();
+                
+                if (referrerError) throw referrerError;
+                
+                // Level 1 bonus (24%)
+                const level1Bonus = investmentAmount * 0.24;
+                await supabase
+                    .from('users')
+                    .update({ balance: referrer.balance + level1Bonus })
+                    .eq('id', referrer.id);
+                
+                await supabase
+                    .from('transactions')
+                    .insert([
+                        { 
+                            user_id: referrer.id, 
+                            type: 'referral',
+                            amount: level1Bonus,
+                            description: `Bónus de convite Nível 1 - ${investmentAmount.toLocaleString()}kz investidos`,
+                            status: 'completed'
+                        }
+                    ]);
+                
+                // Level 2 bonus (4%) if exists
+                if (referrer.referred_by) {
+                    const { data: level2, error: level2Error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('id', referrer.referred_by)
+                        .single();
+                    
+                    if (level2 && !level2Error) {
+                        const level2Bonus = investmentAmount * 0.04;
+                        await supabase
+                            .from('users')
+                            .update({ balance: level2.balance + level2Bonus })
+                            .eq('id', level2.id);
+                        
+                        await supabase
+                            .from('transactions')
+                            .insert([
+                                { 
+                                    user_id: level2.id, 
+                                    type: 'referral',
+                                    amount: level2Bonus,
+                                    description: `Bónus de convite Nível 2 - ${investmentAmount.toLocaleString()}kz investidos`,
+                                    status: 'completed'
+                                }
+                            ]);
+                        
+                        // Level 3 bonus (1%) if exists
+                        if (level2.referred_by) {
+                            const { data: level3, error: level3Error } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('id', level2.referred_by)
+                                .single();
+                            
+                            if (level3 && !level3Error) {
+                                const level3Bonus = investmentAmount * 0.01;
+                                await supabase
+                                    .from('users')
+                                    .update({ balance: level3.balance + level3Bonus })
+                                    .eq('id', level3.id);
+                                
+                                await supabase
+                                    .from('transactions')
+                                    .insert([
+                                        { 
+                                            user_id: level3.id, 
+                                            type: 'referral',
+                                            amount: level3Bonus,
+                                            description: `Bónus de convite Nível 3 - ${investmentAmount.toLocaleString()}kz investidos`,
+                                            status: 'completed'
+                                        }
+                                    ]);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error adding referral bonuses:', error);
+            }
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastId = `toast-${Date.now()}`;
+            
+            const toast = document.createElement('div');
+            toast.className = `toast show align-items-center text-white bg-${type} border-0`;
+            toast.role = 'alert';
+            toast.id = toastId;
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                const bsToast = bootstrap.Toast.getOrCreateInstance(document.getElementById(toastId));
+                bsToast.hide();
+                
+                toast.addEventListener('hidden.bs.toast', () => {
+                    toast.remove();
+                });
+            }, 3000);
+        }
+        
+        // Helper function to download attachments
+        window.downloadAttachment = async function(url) {
+            try {
+                const { data, error } = await supabase.storage
+                    .from('support-attachments')
+                    .download(url);
+                
+                if (error) throw error;
+                
+                const downloadUrl = URL.createObjectURL(data);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = url.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL
